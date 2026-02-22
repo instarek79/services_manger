@@ -7,4 +7,6 @@ task.xml
 dist/
 build/
 .env
+venv/
+venv
 
