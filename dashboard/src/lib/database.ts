@@ -394,7 +394,15 @@ export function checkThresholds(serverId: string, cpuPercent: number, memoryPerc
 
   try {
     const disks = JSON.parse(diskInfo);
+    // Virtual/read-only filesystem types and mount prefixes to skip
+    const virtualFsTypes = new Set(['squashfs', 'tmpfs', 'devtmpfs', 'overlay', 'aufs', 'iso9660', 'ramfs']);
+    const skipMountPrefixes = ['/snap/', '/sys/', '/proc/', '/run/', '/dev/'];
+    const skipDevicePrefixes = ['/dev/loop'];
     for (const disk of disks) {
+      // Skip virtual/read-only mounts (snap, loop, tmpfs, etc.)
+      if (disk.fstype && virtualFsTypes.has(disk.fstype.toLowerCase())) continue;
+      if (disk.mountpoint && skipMountPrefixes.some((p: string) => disk.mountpoint.startsWith(p))) continue;
+      if (disk.device && skipDevicePrefixes.some((p: string) => disk.device.startsWith(p))) continue;
       if (disk.percent >= diskThreshold) {
         const severity = disk.percent >= 95 ? 'critical' : 'warning';
         createAlert(serverId, 'disk', severity, `Disk ${disk.mountpoint} at ${disk.percent.toFixed(1)}% (threshold: ${diskThreshold}%)`, disk.percent, diskThreshold);

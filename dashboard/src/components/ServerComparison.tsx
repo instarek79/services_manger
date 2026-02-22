@@ -1,7 +1,7 @@
 'use client';
 
 import { ServerInfo } from '@/lib/types';
-import { formatBytes } from '@/lib/utils';
+import { formatBytes, filterRealDisks } from '@/lib/utils';
 import { BarChart3 } from 'lucide-react';
 import {
   BarChart,
@@ -42,10 +42,11 @@ export default function ServerComparison({ servers, onServerClick }: ServerCompa
   })).sort((a, b) => b.value - a.value);
 
   const diskData = serversWithMetrics
-    .filter(s => s.metrics!.disks && s.metrics!.disks.length > 0)
+    .filter(s => s.metrics!.disks && filterRealDisks(s.metrics!.disks).length > 0)
     .map(s => {
-      const worstDisk = s.metrics!.disks.reduce((worst, d) =>
-        d.percent > worst.percent ? d : worst, s.metrics!.disks[0]);
+      const realDisks = filterRealDisks(s.metrics!.disks);
+      const worstDisk = realDisks.reduce((worst, d) =>
+        d.percent > worst.percent ? d : worst, realDisks[0]);
       return {
         name: (s.display_name || s.hostname).slice(0, 14),
         id: s.id,

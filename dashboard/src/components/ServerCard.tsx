@@ -1,7 +1,7 @@
 'use client';
 
 import { ServerInfo } from '@/lib/types';
-import { cn, formatBytes, formatUptime, getStatusBg, getCpuColor, getMemoryColor } from '@/lib/utils';
+import { cn, formatBytes, formatUptime, getStatusBg, getCpuColor, getMemoryColor, filterRealDisks } from '@/lib/utils';
 import StatusBadge from './StatusBadge';
 import CircularGauge from './CircularGauge';
 import {
@@ -75,9 +75,9 @@ export default function ServerCard({ server, onClick }: ServerCardProps) {
           </div>
 
           {/* Disk bars */}
-          {m.disks && m.disks.length > 0 && (
+          {m.disks && filterRealDisks(m.disks).length > 0 && (
             <div className="space-y-2 mb-3">
-              {m.disks.slice(0, 3).map((disk, i) => (
+              {filterRealDisks(m.disks).slice(0, 3).map((disk, i) => (
                 <div key={i}>
                   <div className="flex justify-between text-xs mb-0.5">
                     <span className="text-gray-400 flex items-center gap-1">

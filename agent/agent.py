@@ -165,13 +165,31 @@ def collect_metrics(cfg: dict) -> dict:
     }
 
     disks = []
+    # Filesystem types and mount prefixes that are virtual/read-only and should
+    # not trigger disk-space alerts (e.g. snap squashfs loop mounts on Linux).
+    _VIRTUAL_FSTYPES = {"squashfs", "tmpfs", "devtmpfs", "overlay", "aufs",
+                        "iso9660", "udf", "devfs", "proc", "sysfs", "cgroup",
+                        "cgroup2", "debugfs", "tracefs", "securityfs", "fusectl",
+                        "configfs", "ramfs", "hugetlbfs", "mqueue", "binfmt_misc"}
+    _SKIP_MOUNT_PREFIXES = ("/snap/", "/sys/", "/proc/", "/run/", "/dev/")
+    _SKIP_DEVICE_PREFIXES = ("/dev/loop",)
     if cfg.get("collect_disks", True):
         for part in psutil.disk_partitions(all=False):
             try:
+                # Skip virtual / read-only filesystem types
+                if part.fstype.lower() in _VIRTUAL_FSTYPES:
+                    continue
+                # Skip snap/loop mount points
+                if any(part.mountpoint.startswith(p) for p in _SKIP_MOUNT_PREFIXES):
+                    continue
+                # Skip loop devices (e.g. /dev/loop0)
+                if any(part.device.startswith(p) for p in _SKIP_DEVICE_PREFIXES):
+                    continue
                 usage = psutil.disk_usage(part.mountpoint)
                 disks.append({
                     "device": part.device,
                     "mountpoint": part.mountpoint,
+                    "fstype": part.fstype,
                     "total": usage.total,
                     "used": usage.used,
                     "free": usage.free,

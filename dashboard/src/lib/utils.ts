@@ -80,3 +80,18 @@ export function getDiskColor(percent: number): string {
   if (percent >= 70) return '#f59e0b';
   return '#8b5cf6';
 }
+
+const VIRTUAL_FS_TYPES = new Set(['squashfs', 'tmpfs', 'devtmpfs', 'overlay', 'aufs', 'iso9660', 'ramfs']);
+const SKIP_MOUNT_PREFIXES = ['/snap/', '/sys/', '/proc/', '/run/', '/dev/'];
+const SKIP_DEVICE_PREFIXES = ['/dev/loop'];
+
+export function isRealDisk(disk: { device?: string; mountpoint?: string; fstype?: string }): boolean {
+  if (disk.fstype && VIRTUAL_FS_TYPES.has(disk.fstype.toLowerCase())) return false;
+  if (disk.mountpoint && SKIP_MOUNT_PREFIXES.some(p => disk.mountpoint!.startsWith(p))) return false;
+  if (disk.device && SKIP_DEVICE_PREFIXES.some(p => disk.device!.startsWith(p))) return false;
+  return true;
+}
+
+export function filterRealDisks<T extends { device?: string; mountpoint?: string; fstype?: string }>(disks: T[]): T[] {
+  return disks.filter(isRealDisk);
+}

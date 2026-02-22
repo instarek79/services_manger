@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ServerDetailData, ServerInfo } from '@/lib/types';
-import { formatBytes, formatUptime, timeAgo, cn, getCpuColor, getMemoryColor } from '@/lib/utils';
+import { formatBytes, formatUptime, timeAgo, cn, getCpuColor, getMemoryColor, filterRealDisks } from '@/lib/utils';
 import StatusBadge from './StatusBadge';
 import CircularGauge from './CircularGauge';
 import AlertPanel from './AlertPanel';
@@ -229,14 +229,14 @@ export default function ServerDetail({ serverId, onBack, onDelete }: ServerDetai
           )}
 
           {/* Disk Usage */}
-          {metrics?.disks && metrics.disks.length > 0 && (
+          {metrics?.disks && filterRealDisks(metrics.disks).length > 0 && (
             <div className="bg-white dark:bg-gray-900/80 border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm dark:shadow-none">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                 <HardDrive className="w-4 h-4 text-violet-400" />
                 Disk Usage
               </h3>
               <div className="space-y-3">
-                {metrics.disks.map((disk, i) => (
+                {filterRealDisks(metrics.disks).map((disk, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-gray-300">{disk.mountpoint} ({disk.device})</span>
