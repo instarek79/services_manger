@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+agent.log*
+task.xml
+*.egg-info/
+dist/
+build/
+.env
+

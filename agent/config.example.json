@@ -1,0 +1,36 @@
+{
+  "_comment": "Copy this file to config.json and fill in your values. config.json is gitignored.",
+
+  "dashboard_url": "http://localhost:3000",
+  "server_id": "",
+  "api_key": "",
+
+  "collection_interval_minutes": 10,
+  "ping_enabled": true,
+
+  "display_name": "",
+  "group_name": "Default",
+  "tags": [],
+
+  "collect_processes": true,
+  "top_processes_count": 15,
+  "collect_disks": true,
+  "collect_network": true,
+  "monitored_services": [],
+  "auto_discover_services": true,
+
+  "live_enabled": false,
+  "live_interval_seconds": 10,
+  "live_retention_minutes": 30,
+
+  "log_file": "agent.log",
+  "log_level": "INFO",
+  "log_max_bytes": 5242880,
+  "log_backup_count": 3,
+
+  "request_timeout_seconds": 30,
+  "retry_attempts": 3,
+  "retry_delay_seconds": 10,
+  "verify_ssl": true,
+  "offline_buffer_max": 100
+}
